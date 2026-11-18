@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Image from "next/image";
 import type { Dictionary, SectionKey } from "@/content/types";
 import { getDictionary, otherLocale } from "@/content";
@@ -23,6 +25,9 @@ function SectionLabel({ num, label, className = "label" }: { num: string; label:
     </span>
   );
 }
+
+// The CV buttons only render once the PDF is in /public (checked at build time).
+const hasCv = existsSync(join(process.cwd(), "public", CV_PATH));
 
 export function Home({ t }: { t: Dictionary }) {
   const alt = getDictionary(otherLocale(t.locale));
@@ -54,10 +59,12 @@ export function Home({ t }: { t: Dictionary }) {
                   {t.hero.talk}
                   <ArrowRight />
                 </a>
-                <a href={CV_PATH} download className="btn btn-glass lift">
-                  <Download />
-                  {t.hero.cv}
-                </a>
+                {hasCv && (
+                  <a href={CV_PATH} download className="btn btn-glass lift">
+                    <Download />
+                    {t.hero.cv}
+                  </a>
+                )}
               </div>
             </div>
 
@@ -322,16 +329,18 @@ export function Home({ t }: { t: Dictionary }) {
                 </span>
                 <ArrowUpRight className="arrow" />
               </a>
-              <a href={CV_PATH} download className="chan">
-                <span className="chan-ico">
-                  <FileDoc />
-                </span>
-                <span className="chan-text">
-                  <span>{t.contact.cv}</span>
-                  <span>PDF</span>
-                </span>
-                <ArrowDown className="arrow-d" />
-              </a>
+              {hasCv && (
+                <a href={CV_PATH} download className="chan">
+                  <span className="chan-ico">
+                    <FileDoc />
+                  </span>
+                  <span className="chan-text">
+                    <span>{t.contact.cv}</span>
+                    <span>PDF</span>
+                  </span>
+                  <ArrowDown className="arrow-d" />
+                </a>
+              )}
             </nav>
           </div>
 
