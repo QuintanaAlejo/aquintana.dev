@@ -294,7 +294,8 @@ textarea:focus-visible {
 .hero-shell {
   display: flex;
   flex-direction: column;
-  min-height: clamp(560px, calc(100svh - 78px), 1000px);
+  /* Hero + ticker fill the first screen, so the ticker is always visible. */
+  min-height: clamp(480px, calc(100svh - 78px), 1000px);
 }
 .hero {
   flex: 1;
@@ -307,14 +308,14 @@ textarea:focus-visible {
   flex-wrap: wrap;
   align-items: center;
   gap: clamp(32px, 5vw, 80px);
-  padding: clamp(24px, 3vw, 48px) 0 clamp(32px, 4vw, 56px);
+  padding: clamp(12px, 3svh, 48px) 0 clamp(20px, 4svh, 56px);
 }
 .hero-text {
   flex: 1.35 1 440px;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: clamp(18px, 3svh, 28px);
 }
 .hero-title {
   margin: 0;
@@ -355,7 +356,8 @@ textarea:focus-visible {
 }
 .hero-photo {
   flex: 1 1 300px;
-  max-width: 400px;
+  /* Shrinks on short screens so the ticker still fits above the fold. */
+  max-width: min(400px, max(220px, calc((100svh - 300px) * 0.8)));
   min-width: 0;
   position: relative;
 }
@@ -367,19 +369,12 @@ textarea:focus-visible {
   bottom: -8%;
   border-radius: 999px;
   filter: blur(64px);
-  opacity: 0.28;
+  /* --fade is driven by scroll while the portrait flies to the navigation. */
+  opacity: calc(0.28 * var(--fade, 1));
   background: var(--acc);
 }
-.hero-glow,
 .hero-frame {
-  transition: opacity 0.35s ease;
-}
-/* Once the portrait has flown to the navigation, its empty frame fades out. */
-.hero-photo.is-flown .hero-glow,
-.hero-photo.is-flown .hero-frame {
-  opacity: 0;
-}
-.hero-frame {
+  opacity: var(--fade, 1);
   position: relative;
   padding: 12px;
   border-radius: 48px;
@@ -400,6 +395,77 @@ textarea:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+@media (max-width: 1023px) {
+  .hero-text {
+    flex-basis: 360px;
+  }
+  .hero-photo {
+    flex-basis: 220px;
+    max-width: min(320px, max(200px, calc((100svh - 300px) * 0.8)));
+  }
+}
+
+/* Phones: small portrait next to the name, so title, intro, buttons and the
+   ticker all fit in the first screen. */
+@media (max-width: 720px) {
+  .hero-inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "photo eyebrow"
+      "title title"
+      "lead lead"
+      "ctas ctas";
+    align-items: center;
+    gap: 18px 16px;
+    padding: 8px 0 22px;
+  }
+  .hero-text {
+    display: contents;
+  }
+  .hero-text > .label {
+    grid-area: eyebrow;
+    line-height: 1.6;
+  }
+  .hero-title {
+    grid-area: title;
+    font-size: clamp(27px, 7.4vw, 34px);
+  }
+  .hero-lead {
+    grid-area: lead;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .hero-ctas {
+    grid-area: ctas;
+  }
+  .hero-ctas .btn {
+    height: 50px;
+  }
+  .hero-photo {
+    grid-area: photo;
+    width: 84px;
+    max-width: none;
+  }
+  .hero-glow {
+    filter: blur(26px);
+  }
+  .hero-frame {
+    padding: 5px;
+    border-radius: 24px;
+  }
+  .hero-foto {
+    border-radius: 19px;
+  }
+  .ticker {
+    padding: 14px 0;
+  }
+  .ticker-item {
+    font-size: 13px;
+    padding: 0 20px;
+  }
 }
 
 /* Ticker */
@@ -1296,11 +1362,12 @@ textarea:focus-visible {
   left: 0;
   top: 0;
   z-index: 60;
-  display: none;
+  visibility: hidden;
   overflow: hidden;
   pointer-events: none;
-  box-shadow: 0 18px 40px -18px rgba(20, 21, 23, 0.5);
-  will-change: transform, width, height;
+  transform-origin: 0 0;
+  will-change: transform, clip-path;
+  contain: layout paint;
 }
 .fly img {
   display: block;
@@ -1322,8 +1389,10 @@ textarea:focus-visible {
 }
 .fly-ring {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   border: 2px solid var(--acc);
 }
 
@@ -1331,14 +1400,26 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
 }
-.theme-one {
-  display: none;
+.menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.menu-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 10px 6px 4px 18px;
+  border-top: 1px solid var(--hair);
+}
+.menu-theme .well {
+  margin-left: 0;
 }
 
+/* Tablets and phones: one centered capsule; sections and theme live in the menu. */
 @media (max-width: 1023px) {
-  .dock-row {
-    justify-content: space-between;
-  }
   .nav-links {
     display: none;
   }
@@ -1346,18 +1427,12 @@ textarea:focus-visible {
     display: inline-flex;
   }
   .pill-theme {
-    position: static;
+    display: none;
   }
 }
 @media (max-width: 520px) {
   .dock {
     padding: 0 8px;
-  }
-  .theme-pair {
-    display: none;
-  }
-  .theme-one {
-    display: inline-flex;
   }
   .pill-main {
     min-width: 0;
@@ -1376,7 +1451,7 @@ textarea:focus-visible {
   .well {
     margin-left: 2px;
   }
-  .well .seg {
+  .pill-main .well .seg {
     min-width: 40px;
     padding: 0 6px;
   }

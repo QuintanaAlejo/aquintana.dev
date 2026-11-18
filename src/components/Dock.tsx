@@ -54,7 +54,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
   const flyMonoRef = useRef<HTMLDivElement>(null);
   const flyRingRef = useRef<HTMLSpanElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const applyTheme = useCallback((t: Theme) => {
     document.documentElement.setAttribute("data-theme", t);
@@ -72,6 +72,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
     const photoBox = document.getElementById("hero-photo");
     const fotoImg = foto?.querySelector("img") ?? null;
     let raf = 0;
+    let r0 = 36;
 
     const measure = () => {
       raf = 0;
@@ -89,41 +90,60 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
       const slot = slotRef.current;
       const fly = flyRef.current;
       if (!foto || !slot || !fly) {
-        setFilled(st > 260);
+        setFilled(st > 180);
         return;
       }
       const f = foto.getBoundingClientRect();
       const k = slot.getBoundingClientRect();
-      const dist = Math.max(260, f.height * 0.75);
+      const dist = Math.max(180, f.height * 0.75);
       const p = clamp01(st / dist);
       const t = p * p * (3 - 2 * p);
       const flying = !reduce && p > 0.002 && p < 1;
 
       setFilled(reduce ? p > 0.5 : p >= 1);
       foto.style.opacity = reduce || p <= 0.002 ? "1" : "0";
-      photoBox?.classList.toggle("is-flown", !reduce && p >= 1);
+      // The glass frame and glow fade out as the portrait lifts off.
+      photoBox?.style.setProperty("--fade", reduce ? "1" : String(1 - clamp01(t * 1.6)));
 
       if (!flying) {
-        fly.style.display = "none";
+        fly.style.visibility = "hidden";
         return;
       }
-      const lerp = (a: number, b: number) => a + (b - a) * t;
-      const w = lerp(f.width, k.width);
-      const h = lerp(f.height, k.height);
-      const round = Math.min(1, t * 3);
+
+      // The clone keeps the photo's size and only moves with transform (GPU),
+      // while clip-path crops it to a square and rounds it into a circle.
+      const W = f.width;
+      const H = f.height;
+      if (fly.dataset.size !== `${W}x${H}`) {
+        fly.dataset.size = `${W}x${H}`;
+        fly.style.width = `${W}px`;
+        fly.style.height = `${H}px`;
+        r0 = parseFloat(getComputedStyle(foto).borderTopLeftRadius) || 36;
+        if (flyMonoRef.current) flyMonoRef.current.style.fontSize = `${(15 * W) / k.width}px`;
+      }
       const img = flyImgRef.current;
       if (img && fotoImg && !img.getAttribute("src")) img.src = fotoImg.currentSrc || fotoImg.src;
-      fly.style.display = "block";
-      fly.style.width = `${w}px`;
-      fly.style.height = `${h}px`;
-      fly.style.transform = `translate3d(${lerp(f.left, k.left)}px, ${lerp(f.top, k.top)}px, 0)`;
-      fly.style.borderRadius = `${36 + (Math.min(w, h) / 2 - 36) * round}px`;
+
+      const lerp = (a: number, b: number) => a + (b - a) * t;
+      const s = lerp(1, k.width / W);
+      const inset = (Math.max(0, H - W) / 2) * clamp01(t * 1.5);
+      const radius = r0 + (W / 2 - r0) * Math.min(1, t * 3);
+      const cx = lerp(f.left + W / 2, k.left + k.width / 2);
+      const cy = lerp(f.top + H / 2, k.top + k.height / 2);
+
+      fly.style.transform = `translate3d(${cx - (s * W) / 2}px, ${cy - (s * H) / 2}px, 0) scale(${s})`;
+      fly.style.clipPath = `inset(${inset}px 0 round ${radius}px)`;
+      fly.style.visibility = "visible";
+
       const ao = String(clamp01((t - 0.45) / 0.4));
-      if (flyMonoRef.current) {
-        flyMonoRef.current.style.opacity = ao;
-        flyMonoRef.current.style.fontSize = `${Math.max(10, Math.round(h * 0.36))}px`;
+      if (flyMonoRef.current) flyMonoRef.current.style.opacity = ao;
+      const ring = flyRingRef.current;
+      if (ring) {
+        ring.style.opacity = ao;
+        ring.style.top = ring.style.bottom = `${inset}px`;
+        ring.style.borderRadius = `${radius}px`;
+        ring.style.borderWidth = `${2 / s}px`;
       }
-      if (flyRingRef.current) flyRingRef.current.style.opacity = ao;
     };
 
     const onScroll = () => {
@@ -163,6 +183,31 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
   const current = sections.find((s) => s.key === active);
   const other = nav.otherLocale;
   const langHref = `${other.path}#${active === "home" ? altHomeId : altIds[active]}`;
+
+  const themeSwitch = (
+    <div role="group" aria-label={nav.theme} className="theme-pair">
+      <button
+        type="button"
+        className={`seg seg-icon tool${theme === "light" ? " is-on" : ""}`}
+        aria-pressed={theme === "light"}
+        aria-label={nav.light}
+        title={nav.light}
+        onClick={() => applyTheme("light")}
+      >
+        <Sun />
+      </button>
+      <button
+        type="button"
+        className={`seg seg-icon tool${theme === "dark" ? " is-on" : ""}`}
+        aria-pressed={theme === "dark"}
+        aria-label={nav.dark}
+        title={nav.dark}
+        onClick={() => applyTheme("dark")}
+      >
+        <Moon />
+      </button>
+    </div>
+  );
 
   return (
     <div className={`dock${up ? " is-up" : ""}`}>
@@ -216,62 +261,38 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
           </div>
         </div>
 
+        {/* Desktop: theme switch in its own capsule. On smaller screens it lives in the menu. */}
         <div className="pill pill-theme">
           <span className="rim" aria-hidden="true" />
-          <div role="group" aria-label={nav.theme} className="theme-pair">
-            <button
-              type="button"
-              className={`seg seg-icon tool${theme === "light" ? " is-on" : ""}`}
-              aria-pressed={theme === "light"}
-              aria-label={nav.light}
-              title={nav.light}
-              onClick={() => applyTheme("light")}
-            >
-              <Sun />
-            </button>
-            <button
-              type="button"
-              className={`seg seg-icon tool${theme === "dark" ? " is-on" : ""}`}
-              aria-pressed={theme === "dark"}
-              aria-label={nav.dark}
-              title={nav.dark}
-              onClick={() => applyTheme("dark")}
-            >
-              <Moon />
-            </button>
-          </div>
-          {/* Narrow phones: one button that flips the theme. */}
-          <button
-            type="button"
-            className="seg seg-icon tool theme-one"
-            aria-label={theme === "dark" ? nav.light : nav.dark}
-            title={theme === "dark" ? nav.light : nav.dark}
-            onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun /> : <Moon />}
-          </button>
+          {themeSwitch}
         </div>
       </div>
 
       {menuOpen && (
-        <nav ref={menuRef} id="dock-menu" aria-label={nav.sections} className="pill menu">
+        <div ref={menuRef} id="dock-menu" className="pill menu">
           <span className="rim" aria-hidden="true" />
-          {sections.map((s) => (
-            <a
-              key={s.key}
-              href={`#${s.id}`}
-              onClick={() => setMenuOpen(false)}
-              className={`navi${active === s.key ? " is-on" : ""}`}
-              aria-current={active === s.key ? "location" : undefined}
-            >
-              <span style={{ display: "inline-flex", alignItems: "center" }}>
-                <span className="navi-dot" aria-hidden="true" />
-                {s.label}
-              </span>
-              <span className="num">{s.num}</span>
-            </a>
-          ))}
-        </nav>
+          <nav aria-label={nav.sections} className="menu-links">
+            {sections.map((s) => (
+              <a
+                key={s.key}
+                href={`#${s.id}`}
+                onClick={() => setMenuOpen(false)}
+                className={`navi${active === s.key ? " is-on" : ""}`}
+                aria-current={active === s.key ? "location" : undefined}
+              >
+                <span style={{ display: "inline-flex", alignItems: "center" }}>
+                  <span className="navi-dot" aria-hidden="true" />
+                  {s.label}
+                </span>
+                <span className="num">{s.num}</span>
+              </a>
+            ))}
+          </nav>
+          <div className="menu-theme">
+            <span className="label">{nav.theme}</span>
+            <div className="well">{themeSwitch}</div>
+          </div>
+        </div>
       )}
 
       <div ref={flyRef} className="fly" aria-hidden="true">
