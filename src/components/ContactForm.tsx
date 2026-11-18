@@ -4,10 +4,13 @@ import { useState, type FormEvent } from "react";
 import type { Dictionary } from "@/content/types";
 import { WEB3FORMS_KEY } from "@/lib/site";
 import { ArrowRight, Check, Spinner } from "./icons";
+import { Rw } from "./Rewrite";
 
 type Copy = Dictionary["contact"]["form"];
 type Field = "name" | "email" | "message";
-type Errors = Partial<Record<Field, string>>;
+// Errors are stored as copy keys (not text) so they follow a language switch.
+type ErrorKey = "errName" | "errEmailEmpty" | "errEmailFormat" | "errMessage";
+type Errors = Partial<Record<Field, ErrorKey>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const TIMEOUT_MS = 10000;
@@ -35,10 +38,10 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
     const message = val("message");
 
     const next: Errors = {};
-    if (!name) next.name = copy.errName;
-    if (!email) next.email = copy.errEmailEmpty;
-    else if (!EMAIL_RE.test(email)) next.email = copy.errEmailFormat;
-    if (!message) next.message = copy.errMessage;
+    if (!name) next.name = "errName";
+    if (!email) next.email = "errEmailEmpty";
+    else if (!EMAIL_RE.test(email)) next.email = "errEmailFormat";
+    if (!message) next.message = "errMessage";
     if (next.name || next.email || next.message) {
       setErrors(next);
       const first = next.name ? "name" : next.email ? "email" : "message";
@@ -92,10 +95,14 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
           AQ
         </span>
         <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span className="label">{copy.to}</span>
+          <span className="label">
+            <Rw>{copy.to}</Rw>
+          </span>
           <span style={{ fontWeight: 500 }}>Alejo Quintana</span>
         </span>
-        <span className="label">{copy.newMessage}</span>
+        <span className="label">
+          <Rw>{copy.newMessage}</Rw>
+        </span>
       </div>
 
       {status === "sent" ? (
@@ -103,19 +110,21 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
           <span className="sent-check" aria-hidden="true">
             <Check size={26} />
           </span>
-          <h3 className="h3">{copy.sentTitle}</h3>
+          <h3 className="h3">
+            <Rw>{copy.sentTitle}</Rw>
+          </h3>
           <p className="inv-muted" style={{ margin: 0, maxWidth: "36ch" }}>
-            {copy.sentText}
+            <Rw>{copy.sentText}</Rw>
           </p>
           <button type="button" className="btn-ghost-inv" onClick={() => setStatus("idle")}>
-            {copy.again}
+            <Rw>{copy.again}</Rw>
           </button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div className={`field${errors.name ? " is-bad" : ""}`}>
             <label htmlFor={id("name")} className="label">
-              {copy.name}
+              <Rw>{copy.name}</Rw>
             </label>
             <div className="field-col">
               <input
@@ -131,7 +140,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
               />
               {errors.name && (
                 <span id={id("name-err")} className="field-err">
-                  {errors.name}
+                  <Rw>{copy[errors.name]}</Rw>
                 </span>
               )}
             </div>
@@ -139,7 +148,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
 
           <div className={`field${errors.email ? " is-bad" : ""}`}>
             <label htmlFor={id("email")} className="label">
-              {copy.email}
+              <Rw>{copy.email}</Rw>
             </label>
             <div className="field-col">
               <input
@@ -156,7 +165,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
               />
               {errors.email && (
                 <span id={id("email-err")} className="field-err">
-                  {errors.email}
+                  <Rw>{copy[errors.email]}</Rw>
                 </span>
               )}
             </div>
@@ -164,7 +173,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
 
           <div className={`field is-area${errors.message ? " is-bad" : ""}`}>
             <label htmlFor={id("message")} className="label">
-              {copy.message}
+              <Rw>{copy.message}</Rw>
             </label>
             <textarea
               id={id("message")}
@@ -182,7 +191,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
             <div className="area-foot">
               {errors.message && (
                 <span id={id("message-err")} className="field-err">
-                  {errors.message}
+                  <Rw>{copy[errors.message]}</Rw>
                 </span>
               )}
               <span className="counter" aria-hidden="true">
@@ -197,14 +206,16 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
           </div>
 
           <div className="form-foot">
-            <span className="form-note">{copy.note}</span>
+            <span className="form-note">
+              <Rw>{copy.note}</Rw>
+            </span>
             <button type="submit" className="send" disabled={sending} aria-busy={sending}>
-              {sending ? copy.sending : copy.send}
+              <Rw>{sending ? copy.sending : copy.send}</Rw>
               {sending ? <Spinner className="spin" /> : <ArrowRight />}
             </button>
           </div>
           <p role="alert" className="form-fail" hidden={status !== "failed"}>
-            {status === "failed" ? copy.failed : ""}
+            {status === "failed" ? <Rw>{copy.failed}</Rw> : null}
           </p>
         </div>
       )}

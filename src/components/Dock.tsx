@@ -1,20 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { Dictionary, SectionKey } from "@/content/types";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type MouseEvent } from "react";
+import type { Dictionary, Locale, SectionKey } from "@/content/types";
 import { Chevron, Moon, Sun } from "./icons";
+import { Rw } from "./Rewrite";
 
 type Theme = "light" | "dark";
 type Active = SectionKey | "home";
 
 type DockProps = {
-  homeId: string;
-  sections: Dictionary["sections"];
-  nav: Dictionary["nav"];
-  /** Section ids of the other language, so switching keeps you in the same section. */
-  altHomeId: string;
-  altIds: Record<SectionKey, string>;
+  t: Dictionary;
+  /** Switches language in place (no reload). */
+  onSwitchLocale: (locale: Locale) => void;
 };
+
+const LOCALES: { locale: Locale; code: string; name: string; path: string }[] = [
+  { locale: "es", code: "ES", name: "Español", path: "/" },
+  { locale: "en", code: "EN", name: "English", path: "/en" },
+];
+
+/** A two-option switch whose highlight slides to the selected option. */
+const thumbStyle = (i: number | null) => ({ "--i": i ?? 0 }) as CSSProperties;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -41,7 +47,8 @@ const readTheme = (): Theme => {
  * becomes the "AQ" monogram. The flight is driven straight from the scroll
  * position (no timers) and is skipped entirely with reduced motion.
  */
-export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
+export function Dock({ t, onSwitchLocale }: DockProps) {
+  const { homeId, sections, nav, locale } = t;
   const [active, setActive] = useState<Active>("home");
   const [up, setUp] = useState(false);
   const [filled, setFilled] = useState(false);
@@ -181,11 +188,23 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
   }, [menuOpen]);
 
   const current = sections.find((s) => s.key === active);
-  const other = nav.otherLocale;
-  const langHref = `${other.path}#${active === "home" ? altHomeId : altIds[active]}`;
 
+  const onLocaleClick = (e: MouseEvent<HTMLAnchorElement>, next: Locale) => {
+    // Let modified clicks (new tab, etc.) behave like a normal link.
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    onSwitchLocale(next);
+  };
+
+  const themeIndex = theme === null ? null : theme === "light" ? 0 : 1;
   const themeSwitch = (
-    <div role="group" aria-label={nav.theme} className="theme-pair">
+    <div
+      role="group"
+      aria-label={nav.theme}
+      className={`theme-pair seg-group${themeIndex === null ? " is-unset" : ""}`}
+      style={thumbStyle(themeIndex)}
+    >
+      <span className="seg-thumb" aria-hidden="true" />
       <button
         type="button"
         className={`seg seg-icon tool${theme === "light" ? " is-on" : ""}`}
@@ -231,7 +250,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
                 aria-current={active === s.key ? "location" : undefined}
               >
                 <span className="navi-dot" aria-hidden="true" />
-                {s.label}
+                <Rw>{s.label}</Rw>
               </a>
             ))}
           </nav>
@@ -245,18 +264,34 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
             onClick={() => setMenuOpen((o) => !o)}
           >
             <span className="num">{current ? current.num : "00"}</span>
-            <span className="menu-label">{current ? current.label : nav.home}</span>
+            <span className="menu-label">
+              <Rw>{current ? current.label : nav.home}</Rw>
+            </span>
             <Chevron size={16} />
           </button>
 
           <div className="well">
-            <div role="group" aria-label={nav.language} style={{ display: "flex", alignItems: "center" }}>
-              <span className="seg is-on" aria-current="true">
-                {nav.currentCode}
-              </span>
-              <a href={langHref} hrefLang={other.lang} lang={other.lang} aria-label={other.name} className="seg tool">
-                {other.code}
-              </a>
+            <div
+              role="group"
+              aria-label={nav.language}
+              className="seg-group"
+              style={thumbStyle(LOCALES.findIndex((l) => l.locale === locale))}
+            >
+              <span className="seg-thumb" aria-hidden="true" />
+              {LOCALES.map((l) => (
+                <a
+                  key={l.locale}
+                  href={l.path}
+                  hrefLang={l.locale}
+                  lang={l.locale}
+                  aria-label={l.name}
+                  aria-current={l.locale === locale ? "true" : undefined}
+                  className={`seg tool${l.locale === locale ? " is-on" : ""}`}
+                  onClick={(e) => onLocaleClick(e, l.locale)}
+                >
+                  {l.code}
+                </a>
+              ))}
             </div>
           </div>
         </div>
@@ -282,14 +317,16 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
               >
                 <span style={{ display: "inline-flex", alignItems: "center" }}>
                   <span className="navi-dot" aria-hidden="true" />
-                  {s.label}
+                  <Rw>{s.label}</Rw>
                 </span>
                 <span className="num">{s.num}</span>
               </a>
             ))}
           </nav>
           <div className="menu-theme">
-            <span className="label">{nav.theme}</span>
+            <span className="label">
+              <Rw>{nav.theme}</Rw>
+            </span>
             <div className="well">{themeSwitch}</div>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import { Home } from "@/components/Home";
-import { es } from "@/content/es";
+import { Site } from "@/components/Site";
+import { cvAvailability } from "@/lib/cv";
 
 export default function Page() {
-  return <Home t={es} />;
+  return <Site initialLocale="es" cv={cvAvailability()} />;
 }

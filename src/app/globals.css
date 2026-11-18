@@ -301,6 +301,8 @@ textarea:focus-visible {
   flex: 1;
   display: flex;
   align-items: center;
+  /* "Back to top" links land at the very top, so the portrait is back in place. */
+  scroll-margin-top: 200px;
 }
 .hero-inner {
   width: 100%;
@@ -893,10 +895,10 @@ textarea:focus-visible {
   flex-direction: column;
   line-height: 1.35;
 }
-.chan-text span:first-child {
+.chan-text > span:first-child {
   font-weight: 500;
 }
-.chan-text span:last-child {
+.chan-text > span:last-child {
   font-family: var(--fm);
   font-size: 12px;
   color: var(--inv-ink2);
@@ -1331,6 +1333,45 @@ textarea:focus-visible {
 .seg-icon {
   width: 44px;
   padding: 0;
+}
+
+/* Two-option switches (language, theme): the highlight slides between them. */
+.seg-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+}
+.seg-group > .seg {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  transition: color 0.3s ease;
+}
+.seg-group > .seg.is-on {
+  background-color: transparent;
+  box-shadow: none;
+}
+.seg-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  border-radius: 999px;
+  background: var(--seg-on);
+  box-shadow: 0 1px 2px rgba(20, 21, 23, 0.12), 0 4px 10px -4px rgba(20, 21, 23, 0.25);
+  transform: translateX(calc(var(--i, 0) * 100%));
+  transition: transform 0.45s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.2s ease;
+}
+.seg-group.is-unset .seg-thumb {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .seg-thumb {
+    transition: none;
+  }
 }
 .tool {
   transition: background-color 0.25s ease, color 0.25s ease;

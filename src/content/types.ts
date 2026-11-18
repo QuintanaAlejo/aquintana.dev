@@ -21,8 +21,6 @@ export type Dictionary = {
     theme: string;
     light: string;
     dark: string;
-    otherLocale: { code: string; name: string; path: "/" | "/en"; lang: Locale };
-    currentCode: string;
   };
   hero: {
     eyebrow: string;

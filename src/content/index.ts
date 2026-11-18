@@ -5,4 +5,3 @@ import type { Dictionary, Locale } from "./types";
 const dictionaries: Record<Locale, Dictionary> = { es, en };
 
 export const getDictionary = (locale: Locale): Dictionary => dictionaries[locale];
-export const otherLocale = (locale: Locale): Locale => (locale === "es" ? "en" : "es");

@@ -27,8 +27,6 @@ export const es: Dictionary = {
     theme: "Tema",
     light: "Modo claro",
     dark: "Modo oscuro",
-    otherLocale: { code: "EN", name: "English", path: "/en", lang: "en" },
-    currentCode: "ES",
   },
   hero: {
     eyebrow: "Alejo Quintana · Ingeniero de software",
