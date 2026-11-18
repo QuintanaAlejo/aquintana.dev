@@ -19,7 +19,7 @@ El formulario usa la access key pública del form "Portfolio form" de Web3Forms 
 
 - **Textos:** `src/content/es.ts` y `src/content/en.ts` (misma estructura, tipada en `types.ts`).
 - **Fotos:** `src/assets/fotos/retrato.jpg` (portada) y `src/assets/fotos/charla.jpg` (formación). Para cambiarlas, reemplazá el archivo por otro con el mismo nombre y volvé a desplegar.
-- **CV:** `public/cv/Alejo-Quintana-CV.pdf`. Mismo criterio: reemplazar el archivo y desplegar.
+- **CV:** versión web de cada idioma: `public/cv/Alejo-Quintana-CV-ES.pdf` (se descarga desde `/`) y `public/cv/Alejo-Quintana-CV-EN.pdf` (desde `/en`). Mismo criterio: reemplazar el archivo y desplegar. Si falta el PDF de un idioma, ese idioma no muestra los botones de descarga.
 - **Capturas de proyectos y logos:** `src/assets/proyectos/` y `src/assets/logos/`.
 
 ## Sistema de diseño

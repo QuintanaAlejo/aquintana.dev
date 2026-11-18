@@ -10,6 +10,7 @@ export const en: Dictionary = {
       "Software engineer focused on modernizing legacy systems into cloud architectures and bringing artificial intelligence into day-to-day business operations.",
     ogAlt: "Alejo Quintana, software engineer: I turn legacy systems into modern software, with AI at the core.",
   },
+  cv: { href: "/cv/Alejo-Quintana-CV-EN.pdf", filename: "Alejo Quintana - CV (English).pdf" },
   homeId: "home",
   sections: [
     { key: "now", id: "now", label: "Now", num: "01" },

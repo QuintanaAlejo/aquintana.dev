@@ -6,12 +6,6 @@ export const GRA_URL = "https://www.gracapacitaciones.com";
 export const ZONDAS_URL = "https://zondas.co";
 
 /**
- * The CV is a plain file in /public. To update it, replace the PDF with one
- * that has the same name and redeploy; no component needs to change.
- */
-export const CV_PATH = "/cv/Alejo-Quintana-CV.pdf";
-
-/**
  * Web3Forms access key for the "Portfolio form". Web3Forms keys are public by
  * design (they ship in client code and can only deliver mail to Alejo's inbox),
  * so it lives here; NEXT_PUBLIC_WEB3FORMS_KEY can override it per environment.

@@ -10,6 +10,7 @@ export const es: Dictionary = {
       "Ingeniero de software enfocado en modernizar sistemas legacy hacia arquitecturas cloud y en integrar inteligencia artificial a la operación del negocio.",
     ogAlt: "Alejo Quintana, ingeniero de software: transformo sistemas legacy en software moderno, con IA en el centro.",
   },
+  cv: { href: "/cv/Alejo-Quintana-CV-ES.pdf", filename: "Alejo Quintana - CV.pdf" },
   homeId: "inicio",
   sections: [
     { key: "now", id: "hoy", label: "Hoy", num: "01" },

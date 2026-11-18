@@ -9,6 +9,8 @@ export type Dictionary = {
   ogLocale: string;
   path: "/" | "/en";
   meta: { title: string; description: string; ogAlt: string };
+  /** Web version of the CV for this language (file in /public) and the name it downloads with. */
+  cv: { href: string; filename: string };
   homeId: string;
   sections: NavSection[];
   nav: {

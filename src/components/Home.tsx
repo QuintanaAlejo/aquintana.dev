@@ -3,7 +3,7 @@ import { join } from "node:path";
 import Image from "next/image";
 import type { Dictionary, SectionKey } from "@/content/types";
 import { getDictionary, otherLocale } from "@/content";
-import { CV_PATH, EMAIL, GRA_URL, LINKEDIN_URL, ZONDAS_URL } from "@/lib/site";
+import { EMAIL, GRA_URL, LINKEDIN_URL, ZONDAS_URL } from "@/lib/site";
 import retrato from "@/assets/fotos/retrato.jpg";
 import charla from "@/assets/fotos/charla.jpg";
 import graWeb from "@/assets/proyectos/gra-web.jpg";
@@ -26,10 +26,12 @@ function SectionLabel({ num, label, className = "label" }: { num: string; label:
   );
 }
 
-// The CV buttons only render once the PDF is in /public (checked at build time).
-const hasCv = existsSync(join(process.cwd(), "public", CV_PATH));
+// Each language links its own CV. The buttons only render if that PDF is in
+// /public (checked at build time). To update a CV, replace the file and redeploy.
+const cvExists = (href: string) => existsSync(join(process.cwd(), "public", href));
 
 export function Home({ t }: { t: Dictionary }) {
+  const hasCv = cvExists(t.cv.href);
   const alt = getDictionary(otherLocale(t.locale));
   const s = Object.fromEntries(t.sections.map((x) => [x.key, x])) as Record<SectionKey, Dictionary["sections"][number]>;
   const altIds = Object.fromEntries(alt.sections.map((x) => [x.key, x.id])) as Record<SectionKey, string>;
@@ -60,7 +62,7 @@ export function Home({ t }: { t: Dictionary }) {
                   <ArrowRight />
                 </a>
                 {hasCv && (
-                  <a href={CV_PATH} download className="btn btn-glass lift">
+                  <a href={t.cv.href} download={t.cv.filename} className="btn btn-glass lift">
                     <Download />
                     {t.hero.cv}
                   </a>
@@ -330,7 +332,7 @@ export function Home({ t }: { t: Dictionary }) {
                 <ArrowUpRight className="arrow" />
               </a>
               {hasCv && (
-                <a href={CV_PATH} download className="chan">
+                <a href={t.cv.href} download={t.cv.filename} className="chan">
                   <span className="chan-ico">
                     <FileDoc />
                   </span>
