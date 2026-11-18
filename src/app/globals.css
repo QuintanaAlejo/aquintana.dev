@@ -370,6 +370,15 @@ textarea:focus-visible {
   opacity: 0.28;
   background: var(--acc);
 }
+.hero-glow,
+.hero-frame {
+  transition: opacity 0.35s ease;
+}
+/* Once the portrait has flown to the navigation, its empty frame fades out. */
+.hero-photo.is-flown .hero-glow,
+.hero-photo.is-flown .hero-frame {
+  opacity: 0;
+}
 .hero-frame {
   position: relative;
   padding: 12px;
@@ -488,17 +497,27 @@ textarea:focus-visible {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto auto;
 }
+/* Subgrid keeps the three steps aligned even when a date wraps. */
 .journey li {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   min-width: 0;
+}
+.journey li > * {
+  min-width: 0;
+}
+.journey li:not(:last-child) > span {
+  padding-right: 12px;
 }
 .journey-rail {
   display: flex;
   align-items: center;
   height: 18px;
+  margin-bottom: 12px;
 }
 .journey-dot {
   flex: 0 0 12px;
@@ -519,12 +538,6 @@ textarea:focus-visible {
   border-radius: 2px;
   background: var(--ink3);
 }
-.journey-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-right: 12px;
-}
 .journey-when {
   min-height: 1.5em;
   font-family: var(--fm);
@@ -534,6 +547,7 @@ textarea:focus-visible {
   color: var(--ink3);
 }
 .journey-what {
+  margin-top: 4px;
   font-weight: 500;
   line-height: 1.3;
 }
@@ -1302,7 +1316,15 @@ textarea:focus-visible {
   border: 2px solid var(--acc);
 }
 
-@media (max-width: 879px) {
+.theme-pair {
+  display: flex;
+  align-items: center;
+}
+.theme-one {
+  display: none;
+}
+
+@media (max-width: 1023px) {
   .dock-row {
     justify-content: space-between;
   }
@@ -1316,13 +1338,41 @@ textarea:focus-visible {
     position: static;
   }
 }
-@media (max-width: 400px) {
+@media (max-width: 520px) {
+  .dock {
+    padding: 0 8px;
+  }
+  .theme-pair {
+    display: none;
+  }
+  .theme-one {
+    display: inline-flex;
+  }
+  .pill-main {
+    min-width: 0;
+  }
   .menu-btn {
+    min-width: 0;
     padding: 0 10px;
     gap: 8px;
   }
+  .menu-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .well {
     margin-left: 2px;
+  }
+  .well .seg {
+    min-width: 40px;
+    padding: 0 6px;
+  }
+}
+@media (max-width: 400px) {
+  .menu-btn .num {
+    display: none;
   }
 }
 

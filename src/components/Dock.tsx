@@ -69,6 +69,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const foto = document.getElementById("hero-foto");
+    const photoBox = document.getElementById("hero-photo");
     const fotoImg = foto?.querySelector("img") ?? null;
     let raf = 0;
 
@@ -100,6 +101,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
 
       setFilled(reduce ? p > 0.5 : p >= 1);
       foto.style.opacity = reduce || p <= 0.002 ? "1" : "0";
+      photoBox?.classList.toggle("is-flown", !reduce && p >= 1);
 
       if (!flying) {
         fly.style.display = "none";
@@ -198,7 +200,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
             onClick={() => setMenuOpen((o) => !o)}
           >
             <span className="num">{current ? current.num : "00"}</span>
-            {current ? current.label : nav.home}
+            <span className="menu-label">{current ? current.label : nav.home}</span>
             <Chevron size={16} />
           </button>
 
@@ -216,7 +218,7 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
 
         <div className="pill pill-theme">
           <span className="rim" aria-hidden="true" />
-          <div role="group" aria-label={nav.theme} style={{ display: "flex", alignItems: "center" }}>
+          <div role="group" aria-label={nav.theme} className="theme-pair">
             <button
               type="button"
               className={`seg seg-icon tool${theme === "light" ? " is-on" : ""}`}
@@ -238,6 +240,16 @@ export function Dock({ homeId, sections, nav, altHomeId, altIds }: DockProps) {
               <Moon />
             </button>
           </div>
+          {/* Narrow phones: one button that flips the theme. */}
+          <button
+            type="button"
+            className="seg seg-icon tool theme-one"
+            aria-label={theme === "dark" ? nav.light : nav.dark}
+            title={theme === "dark" ? nav.light : nav.dark}
+            onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? <Sun /> : <Moon />}
+          </button>
         </div>
       </div>
 

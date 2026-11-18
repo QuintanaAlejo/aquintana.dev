@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import type { Dictionary } from "@/content/types";
-import { WEB3FORMS_KEY } from "@/lib/site";
+import { EMAIL, WEB3FORMS_KEY } from "@/lib/site";
 import { ArrowRight, Check, Spinner } from "./icons";
 
 type Copy = Dictionary["contact"]["form"];
@@ -16,7 +16,6 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
   const [len, setLen] = useState(0);
-  const formRef = useRef<HTMLFormElement>(null);
 
   const id = (f: string) => `${idPrefix}-${f}`;
 
@@ -54,11 +53,17 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
       return;
     }
 
+    // Until the Web3Forms key is configured, hand the message to the visitor's mail app.
+    if (!WEB3FORMS_KEY) {
+      const body = `${message}\n\n— ${name} <${email}>`;
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(copy.subject)}&body=${encodeURIComponent(body)}`;
+      return;
+    }
+
     setStatus("sending");
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
     try {
-      if (!WEB3FORMS_KEY) throw new Error("Missing form key");
       const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -88,7 +93,7 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
   const sending = status === "sending";
 
   return (
-    <form ref={formRef} className="form" noValidate onSubmit={onSubmit}>
+    <form className="form" noValidate onSubmit={onSubmit}>
       <div className="form-head">
         <span className="form-avatar" aria-hidden="true">
           AQ

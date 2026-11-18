@@ -61,7 +61,7 @@ export function Home({ t }: { t: Dictionary }) {
               </div>
             </div>
 
-            <div className="hero-photo enter enter-2">
+            <div id="hero-photo" className="hero-photo enter enter-2">
               <div className="hero-glow breathe" aria-hidden="true" />
               <div className="hero-frame">
                 <div id="hero-foto" className="hero-foto">
@@ -129,10 +129,8 @@ export function Home({ t }: { t: Dictionary }) {
                           <span className={`journey-dot${last ? " is-now" : ""}`} />
                           {!last && <span className="journey-line" />}
                         </div>
-                        <div className="journey-text" style={last ? { paddingRight: 0 } : undefined}>
-                          <span className="journey-when">{j.when || " "}</span>
-                          <span className="journey-what">{j.what}</span>
-                        </div>
+                        <span className="journey-when">{j.when || "\u00a0"}</span>
+                        <span className="journey-what">{j.what}</span>
                       </li>
                     );
                   })}
