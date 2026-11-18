@@ -393,6 +393,7 @@ textarea:focus-visible {
   aspect-ratio: 1200 / 1460;
   border-radius: 36px;
   overflow: hidden;
+  overflow: clip;
 }
 .hero-foto img {
   display: block;
@@ -405,6 +406,7 @@ textarea:focus-visible {
 .ticker {
   width: 100%;
   overflow: hidden;
+  overflow: clip;
   margin: 0 0 clamp(88px, 10vw, 150px);
   padding: 20px 0;
   border-top: 1px solid var(--hair);
@@ -622,6 +624,7 @@ textarea:focus-visible {
   min-width: 0;
   border-radius: 28px;
   overflow: hidden;
+  overflow: clip;
   border: 1px solid var(--hair);
 }
 .proj-shot img {
@@ -664,6 +667,7 @@ textarea:focus-visible {
   border-radius: 40px;
   overflow: hidden;
   min-height: 420px;
+  overflow: clip;
 }
 .edu-photo img {
   object-fit: cover;
@@ -731,6 +735,7 @@ textarea:focus-visible {
 .contact {
   position: relative;
   overflow: hidden;
+  overflow: clip;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 40px clamp(32px, 5vw, 72px);
@@ -983,12 +988,18 @@ textarea:focus-visible {
 .send:disabled {
   cursor: progress;
 }
+/* Honeypot: invisible to people, still in the DOM for bots. */
 .hp {
   position: absolute;
-  left: -10000px;
+  left: 0;
+  top: 0;
   width: 1px;
   height: 1px;
   overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
 }
 .sent {
   display: flex;
