@@ -13,11 +13,7 @@ pnpm build      # build de producción
 pnpm lint
 ```
 
-Variables de entorno (`.env.local` en local, Project Settings → Environment Variables en Vercel):
-
-| Variable | Para qué |
-|---|---|
-| `NEXT_PUBLIC_WEB3FORMS_KEY` | Access key de Web3Forms; los mensajes del formulario llegan a la casilla asociada a esa key. |
+El formulario usa la access key pública del form "Portfolio form" de Web3Forms (`src/lib/site.ts`). Se puede pisar con la variable `NEXT_PUBLIC_WEB3FORMS_KEY` (en `.env.local` o en Vercel).
 
 ## Contenido
 

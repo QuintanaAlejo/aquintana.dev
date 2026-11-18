@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import type { Dictionary } from "@/content/types";
-import { EMAIL, WEB3FORMS_KEY } from "@/lib/site";
+import { WEB3FORMS_KEY } from "@/lib/site";
 import { ArrowRight, Check, Spinner } from "./icons";
 
 type Copy = Dictionary["contact"]["form"];
@@ -50,13 +50,6 @@ export function ContactForm({ copy, idPrefix }: { copy: Copy; idPrefix: string }
     // Honeypot: people never see this field, bots fill it. Pretend it worked.
     if (val("website")) {
       setStatus("sent");
-      return;
-    }
-
-    // Until the Web3Forms key is configured, hand the message to the visitor's mail app.
-    if (!WEB3FORMS_KEY) {
-      const body = `${message}\n\n— ${name} <${email}>`;
-      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(copy.subject)}&body=${encodeURIComponent(body)}`;
       return;
     }
 
