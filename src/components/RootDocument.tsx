@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Dictionary } from "@/content/types";
-import { EMAIL, LINKEDIN_URL, SITE_URL } from "@/lib/site";
+import { EMAIL, GOOGLE_SITE_VERIFICATION, LINKEDIN_URL, SITE_URL } from "@/lib/site";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
@@ -47,6 +47,7 @@ export function buildMetadata(t: Dictionary): Metadata {
       description: t.meta.description,
     },
     robots: { index: true, follow: true },
+    verification: { google: GOOGLE_SITE_VERIFICATION },
   };
 }
 

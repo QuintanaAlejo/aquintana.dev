@@ -5,6 +5,9 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/quintanaalejo/";
 export const GRA_URL = "https://www.gracapacitaciones.com";
 export const ZONDAS_URL = "https://zondas.co";
 
+/** Google Search Console ownership token for the https://aquintana.dev/ property (public by design). */
+export const GOOGLE_SITE_VERIFICATION = "8IHY2U4i8aEywFGAHqBeH0SfcTnyfVUt4KFrb13yWJg";
+
 /**
  * Web3Forms access key for the "Portfolio form". Web3Forms keys are public by
  * design (they ship in client code and can only deliver mail to Alejo's inbox),
